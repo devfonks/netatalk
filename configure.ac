@@ -1,11 +1,12 @@
 dnl configure.in for netatalk
 
-AC_INIT(etc/afpd/main.c)
+AC_INIT
+AC_CONFIG_SRCDIR([etc/afpd/main.c])
 
 NETATALK_VERSION=`cat $srcdir/VERSION`
 AC_SUBST(NETATALK_VERSION)
 
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE(netatalk, ${NETATALK_VERSION})
 AM_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE([enable])
@@ -13,12 +14,36 @@ AM_MAINTAINER_MODE([enable])
 dnl Checks for programs.
 AC_PROG_AWK
 AC_PROG_CC
-AC_PROG_CC_C99
+m4_warn([obsolete],
+[m4_warn([obsolete],
+[m4_warn([obsolete],
+[m4_warn([obsolete],
+[AC_PROG_CC_C99 is obsolete; use AC_PROG_CC
+])dnl
+AC_REQUIRE(AC_PROG_CC) is obsolete; use AC_PROG_CC
+])dnl
+AC_REQUIRE(AC_PROG_CC) is obsolete; use AC_PROG_CC
+])dnl
+AC_REQUIRE(AC_PROG_CC) is obsolete; use AC_PROG_CC
+])dnl
+AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_LIBTOOL_DLOPEN
-AC_PROG_LIBTOOL
+_LT_SET_OPTION([LT_INIT],[dlopen])
+m4_warn([obsolete],[_LT_SET_OPTION([LT_INIT],[dlopen])
+m4_warn([obsolete],[_LT_SET_OPTION([LT_INIT],[dlopen])
+m4_warn([obsolete],[_LT_SET_OPTION([LT_INIT],[dlopen])
+m4_warn([obsolete],[AC_LIBTOOL_DLOPEN: Remove this warning and the call to _LT_SET_OPTION when you
+put the 'dlopen' option into LT_INIT's first parameter.])
+: Remove this warning and the call to _LT_SET_OPTION when you
+put the 'dlopen' option into LT_INIT's first parameter.])
+: Remove this warning and the call to _LT_SET_OPTION when you
+put the 'dlopen' option into LT_INIT's first parameter.])
+: Remove this warning and the call to _LT_SET_OPTION when you
+put the 'dlopen' option into LT_INIT's first parameter.])
+
+LT_INIT
 AC_PROG_PERL
 AC_PROG_GREP
 AC_PROG_PS
@@ -27,7 +52,15 @@ AM_PROG_CC_C_O
 
 dnl Checks for header files.
 AC_HEADER_DIRENT
-AC_HEADER_STDC
+m4_warn([obsolete],
+[The preprocessor macro `STDC_HEADERS' is obsolete.
+  Except in unusual embedded environments, you can safely include all
+  ISO C90 headers unconditionally.])dnl
+# Autoupdate added the next two lines to ensure that your configure
+# script's behavior did not change.  They are probably safe to remove.
+AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
+
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(fcntl.h limits.h stdint.h strings.h time.h sys/param.h sys/fcntl.h sys/file.h sys/ioctl.h sys/time.h sys/mnttab.h sys/statvfs.h sys/stat.h sys/vfs.h mntent.h syslog.h unistd.h termios.h sys/termios.h netdb.h sgtty.h ufs/quota.h mount.h statfs.h sys/types.h dlfcn.h errno.h sys/errno.h sys/uio.h langinfo.h locale.h sys/filio.h)
 AC_CHECK_HEADER(sys/cdefs.h,,
@@ -48,16 +81,37 @@ AC_TYPE_MODE_T
 AC_TYPE_OFF_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
-AC_STRUCT_ST_RDEV
-AC_HEADER_TIME
+m4_warn([obsolete],
+[your code should no longer depend upon `HAVE_ST_RDEV', but
+`HAVE_STRUCT_STAT_ST_RDEV'.  Remove this warning and
+the `AC_DEFINE' when you adjust the code.])dnl
+AC_CHECK_MEMBERS([struct stat.st_rdev],[AC_DEFINE(HAVE_ST_RDEV, 1,
+			    [Define to 1 if your `struct stat' has `st_rdev'.
+			     Deprecated, use `HAVE_STRUCT_STAT_ST_RDEV'
+			     instead.])])
+
+m4_warn([obsolete],
+[Update your code to rely only on HAVE_SYS_TIME_H,
+then remove this warning and the obsolete code below it.
+All current systems provide time.h; it need not be checked for.
+Not all systems provide sys/time.h, but those that do, all allow
+you to include it and time.h simultaneously.])dnl
+AC_CHECK_HEADERS_ONCE([sys/time.h])
+# Obsolete code to be removed.
+if test $ac_cv_header_sys_time_h = yes; then
+  AC_DEFINE([TIME_WITH_SYS_TIME],[1],[Define to 1 if you can safely include both <sys/time.h>
+	     and <time.h>.  This macro is obsolete.])
+fi
+# End of obsolete code.
+
 AC_STRUCT_TM
 
 dnl --------------------------------------------------------------------------
 dnl check if dlsym needs to add an underscore, uses libtool macros 
 dnl --------------------------------------------------------------------------
-AC_LTDL_DLLIB
+LT_LIB_DLLOAD
 AC_CHECK_FUNCS(dlopen dlsym dlclose)
-AC_LTDL_DLSYM_USCORE
+LT_FUNC_DLSYM_USCORE
 if test x"$libltdl_cv_need_uscore" = xyes; then
     AC_DEFINE(DLSYM_PREPEND_UNDERSCORE, 1, [BSD compatibility macro])
 fi
@@ -68,7 +122,19 @@ AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MEMCMP
 AC_HEADER_MAJOR
 AC_FUNC_MMAP
-AC_TYPE_SIGNAL
+m4_warn([obsolete],
+[your code may safely assume C89 semantics that RETSIGTYPE is void.
+Remove this warning and the `AC_CACHE_CHECK' when you adjust the code.])dnl
+AC_CACHE_CHECK([return type of signal handlers],[ac_cv_type_signal],[AC_COMPILE_IFELSE(
+[AC_LANG_PROGRAM([#include <sys/types.h>
+#include <signal.h>
+],
+		 [return *(signal (0, 0)) (0) == 1;])],
+		   [ac_cv_type_signal=int],
+		   [ac_cv_type_signal=void])])
+AC_DEFINE_UNQUOTED([RETSIGTYPE],[$ac_cv_type_signal],[Define as the return type of signal handlers
+		    (`int' or `void').])
+
 AC_FUNC_UTIME_NULL
 AC_FUNC_WAIT3
 AC_CHECK_FUNCS(getcwd gethostname gettimeofday getusershell mkdir rmdir select socket strdup strcasestr strstr strtoul strchr memcpy)
@@ -649,17 +715,16 @@ if test x"$this_os" = "xlinux"; then
 	dnl ----- kernel 2.6 changed struct at_addr to atalk_addr
 	AC_MSG_CHECKING([for struct atalk_addr])
 dnl	AC_COMPILE_IFELSE([
-	AC_TRY_COMPILE([
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <sys/socket.h>
 #include <asm/types.h>
 #include <linux/atalk.h>
 
 	struct atalk_addr foo;
-],
-[ ], [
+]], [[ ]])],[
 		ac_have_atalk_addr=yes
 		AC_MSG_RESULT([yes])
-	], [
+	],[
 		AC_MSG_RESULT([no])
 	])
 
@@ -810,13 +875,11 @@ if test x"$this_os" = "xsolaris"; then
 	   fi
 
            AC_CACHE_CHECK([for timeout_id_t],netatalk_cv_HAVE_TIMEOUT_ID_T,[
-           AC_TRY_LINK([\
+           AC_LINK_IFELSE([AC_LANG_PROGRAM([[\
 #include <sys/stream.h>
-#include <sys/ddi.h>],
-[\
+#include <sys/ddi.h>]], [[\
 timeout_id_t dummy;
-],
-netatalk_cv_HAVE_TIMEOUT_ID_T=yes,netatalk_cv_HAVE_TIMEOUT_ID_T=no,netatalk_cv_HAVE_TIMEOUT_ID_T=cross)])
+]])],[netatalk_cv_HAVE_TIMEOUT_ID_T=yes],[netatalk_cv_HAVE_TIMEOUT_ID_T=no])])
 
 	   AC_DEFINE(HAVE_TIMEOUT_ID_T, test x"$netatalk_cv_HAVE_TIMEOUT_ID" = x"yes", [define for timeout_id_t])
 	fi
@@ -1079,17 +1142,15 @@ if test x"$with_acl_support" = x"yes" ; then
 		AC_CACHE_CHECK([for POSIX ACL support],netatalk_cv_HAVE_POSIX_ACLS,[
 			acl_LIBS=$LIBS
 			LIBS="$LIBS $ACL_LIBS"
-			AC_TRY_LINK([
+			AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 				#include <sys/types.h>
 				#include <sys/acl.h>
-			],[
+			]], [[
 				acl_t acl;
 				int entry_id;
 				acl_entry_t *entry_p;
 				return acl_get_entry(acl, entry_id, entry_p);
-			],
-			[netatalk_cv_HAVE_POSIX_ACLS=yes],
-			[netatalk_cv_HAVE_POSIX_ACLS=no
+			]])],[netatalk_cv_HAVE_POSIX_ACLS=yes],[netatalk_cv_HAVE_POSIX_ACLS=no
                 with_acl_support=no])
 			LIBS=$acl_LIBS
 		])
@@ -1099,16 +1160,14 @@ if test x"$with_acl_support" = x"yes" ; then
 			AC_CACHE_CHECK([for acl_get_perm_np],netatalk_cv_HAVE_ACL_GET_PERM_NP,[
 				acl_LIBS=$LIBS
 				LIBS="$LIBS $ACL_LIBS"
-				AC_TRY_LINK([
+				AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 					#include <sys/types.h>
 					#include <sys/acl.h>
-				],[
+				]], [[
 					acl_permset_t permset_d;
 					acl_perm_t perm;
 					return acl_get_perm_np(permset_d, perm);
-				],
-				[netatalk_cv_HAVE_ACL_GET_PERM_NP=yes],
-				[netatalk_cv_HAVE_ACL_GET_PERM_NP=no])
+				]])],[netatalk_cv_HAVE_ACL_GET_PERM_NP=yes],[netatalk_cv_HAVE_ACL_GET_PERM_NP=no])
 				LIBS=$acl_LIBS
 			])
 			if test x"$netatalk_cv_HAVE_ACL_GET_PERM_NP" = x"yes"; then
@@ -1219,18 +1278,16 @@ if test x"$ac_cv_func_getxattr" = x"yes" ; then
 	AC_CACHE_CHECK([whether xattr interface takes additional options], smb_attr_cv_xattr_add_opt, [
 		old_LIBS=$LIBS
 		LIBS="$LIBS $ACL_LIBS"
-		AC_TRY_COMPILE([
+		AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 			#include <sys/types.h>
 			#if HAVE_ATTR_XATTR_H
 			#include <attr/xattr.h>
 			#elif HAVE_SYS_XATTR_H
 			#include <sys/xattr.h>
 			#endif
-		],[
+		]], [[
 			getxattr(0, 0, 0, 0, 0, 0);
-		],
-	        [smb_attr_cv_xattr_add_opt=yes],
-		[smb_attr_cv_xattr_add_opt=no;LIBS=$old_LIBS])
+		]])],[smb_attr_cv_xattr_add_opt=yes],[smb_attr_cv_xattr_add_opt=no;LIBS=$old_LIBS])
 	])
 	if test x"$smb_attr_cv_xattr_add_opt" = x"yes"; then
 		AC_DEFINE(XATTR_ADD_OPT, 1, [xattr functions have additional options])
@@ -1247,7 +1304,7 @@ AC_DEFINE_UNQUOTED(EA_MODULES,["$neta_cv_eas"],[Available Extended Attributes mo
 dnl --------------------- Check if realpath() takes NULL
 AC_CACHE_CHECK([if the realpath function allows a NULL argument],
     neta_cv_REALPATH_TAKES_NULL, [
-        AC_TRY_RUN([
+        AC_RUN_IFELSE([AC_LANG_SOURCE([[
             #include <stdio.h>
             #include <limits.h>
             #include <signal.h>
@@ -1261,11 +1318,8 @@ AC_CACHE_CHECK([if the realpath function allows a NULL argument],
                 signal(SIGSEGV, exit_on_core);
                 newpath = realpath("/tmp", NULL);
                 exit((newpath != NULL) ? 0 : 1);
-            }],
-            neta_cv_REALPATH_TAKES_NULL=yes,
-            neta_cv_REALPATH_TAKES_NULL=no,
-            neta_cv_REALPATH_TAKES_NULL=cross
-        )
+            }]])],[neta_cv_REALPATH_TAKES_NULL=yes],[neta_cv_REALPATH_TAKES_NULL=no],[neta_cv_REALPATH_TAKES_NULL=cross
+        ])
     ]
 )
 
@@ -1314,7 +1368,7 @@ AM_CONDITIONAL(HAVE_ATFUNCS, test x"$ac_neta_haveatfuncs" = x"yes")
 
 dnl --------------------- generate files
 
-AC_OUTPUT([Makefile
+AC_CONFIG_FILES([Makefile
 	bin/Makefile
 	bin/ad/Makefile
 	bin/adv1tov2/Makefile
@@ -1396,9 +1450,10 @@ AC_OUTPUT([Makefile
 	sys/ultrix/Makefile
 	test/Makefile
 	test/afpd/Makefile
-	],
-	[chmod a+x distrib/config/netatalk-config contrib/shell_utils/apple_*]
-)
+	])
+AC_CONFIG_COMMANDS([default],[chmod a+x distrib/config/netatalk-config contrib/shell_utils/apple_*
+],[])
+AC_OUTPUT
 
 AC_NETATALK_LIBS_SUMMARY
 AC_NETATALK_CONFIG_SUMMARY
